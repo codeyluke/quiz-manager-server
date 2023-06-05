@@ -5,6 +5,7 @@ import { typeOrmAsyncConfig } from 'config/typeorm.config';
 import { QuestionModule } from './question/question.module';
 import { OptionModule } from './option/option.module';
 import { ConfigModule } from '@nestjs/config';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { ConfigModule } from '@nestjs/config';
     QuizModule,
     QuestionModule,
     OptionModule,
+    UserModule,
   ],
 })
 export class AppModule {}
