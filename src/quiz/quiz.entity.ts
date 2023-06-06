@@ -1,3 +1,4 @@
+import { IsOptional } from 'class-validator';
 import { Question } from 'src/question/question.entity';
 import {
   BaseEntity,
@@ -28,6 +29,9 @@ export class Quiz extends BaseEntity {
 
   @Column()
   is_active: boolean;
+
+  @Column({ nullable: true })
+  text: string;
 
   @OneToMany(() => Question, (question) => question.quiz)
   questions: Question[];
