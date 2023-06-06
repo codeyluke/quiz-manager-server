@@ -1,4 +1,3 @@
-import { IsOptional } from 'class-validator';
 import { Question } from 'src/question/question.entity';
 import {
   BaseEntity,
