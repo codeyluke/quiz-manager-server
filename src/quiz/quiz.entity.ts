@@ -31,7 +31,7 @@ export class Quiz extends BaseEntity {
   is_active: boolean;
 
   @Column({ nullable: true })
-  text: string;
+  notes: string;
 
   @OneToMany(() => Question, (question) => question.quiz)
   questions: Question[];
