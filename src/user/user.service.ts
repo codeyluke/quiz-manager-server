@@ -18,4 +18,8 @@ export class UserService {
       email: data.email,
     });
   }
+
+  async findOneWithUsername(username: string): Promise<User> {
+    return await this.repo.findOne({ where: { email: username } });
+  }
 }
