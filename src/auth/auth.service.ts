@@ -4,6 +4,11 @@ import * as bycrypt from 'bcrypt';
 import { User } from 'src/user/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterUserDto } from 'src/user/dto/register-user.req.dto';
+import { config } from 'dotenv';
+import { ConfigService } from '@nestjs/config';
+
+config();
+const configService = new ConfigService();
 
 @Injectable()
 export class AuthService {
@@ -49,7 +54,9 @@ export class AuthService {
       data: {
         ...user,
         access_token: this.jwtService.sign(payload),
-        refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' }),
+        refresh_token: this.jwtService.sign(payload, {
+          expiresIn: configService.get('REFRESH_TOKEN_EXPIRES_IN'),
+        }),
       },
     };
   }

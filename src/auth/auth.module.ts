@@ -23,7 +23,7 @@ const configService = new ConfigService();
     JwtModule.register({
       secret: configService.get('JWT_SECRET'),
       signOptions: {
-        expiresIn: '60s',
+        expiresIn: configService.get('ACCESS_TOKEN_EXPIRES_IN'),
       },
     }),
   ],
