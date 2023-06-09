@@ -1,11 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
-import * as bycrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 import { User } from 'src/user/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterUserDto } from 'src/user/dto/register-user.req.dto';
 import { config } from 'dotenv';
 import { ConfigService } from '@nestjs/config';
+import { LoginRequestDto } from './dto/login.request.dto';
 
 config();
 const configService = new ConfigService();
@@ -17,61 +22,95 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(username: string, password: string): Promise<any> {
-    const user = await this.userService.findOneWithUsername(username);
-    if (user && (await bycrypt.compare(password, user.password))) {
-      const { password, ...result } = user;
-      return result;
-    }
-    return null;
-  }
-
   async register(data: RegisterUserDto) {
     const user = await this.userService.create(data);
-    const payload = {
-      username: user.email,
-      sub: {
-        name: user.name,
-      },
-    };
+    const tokens = await this.getTokens(user.id, user.name);
+    this.updateRefreshToken(user, tokens.refresh_token);
     return {
       data: {
-        ...user,
-        access_token: this.jwtService.sign(payload),
-        refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' }),
+        user: {
+          id: user.id,
+          user: user.name,
+          email: user.email,
+        },
+        tokens,
       },
     };
   }
 
-  async login(user: User) {
-    const payload = {
-      username: user.email,
-      sub: {
-        name: user.name,
-      },
-    };
+  async login(data: LoginRequestDto) {
+    const user = await this.userService.findOneWithUsername(data.username);
+    if (!user) throw new BadRequestException('User do not exists');
+    const passwordMatches = await bcrypt.compare(data.password, user.password);
+    if (!passwordMatches)
+      throw new BadRequestException('Password is incorrect');
+    const tokens = await this.getTokens(user.id, user.name);
+    this.updateRefreshToken(user, tokens.refresh_token);
     return {
       data: {
-        ...user,
-        access_token: this.jwtService.sign(payload),
-        refresh_token: this.jwtService.sign(payload, {
-          expiresIn: configService.get('REFRESH_TOKEN_EXPIRES_IN'),
-        }),
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        },
+        tokens,
       },
     };
   }
 
-  async refreshToken(user: User) {
-    const payload = {
-      username: user.email,
-      sub: {
-        name: user.name,
-      },
-    };
+  async hashData(data: string) {
+    const salt = await bcrypt.genSalt();
+    const hash = await bcrypt.hash(data, salt);
+    return hash;
+  }
+
+  async getTokens(userId: number, username: string) {
+    const [access_token, refresh_token] = await Promise.all([
+      this.jwtService.signAsync(
+        {
+          sub: userId,
+          username,
+        },
+        {
+          secret: configService.get<string>('JWT_ACCESS_TOKEN_SECRET'),
+          expiresIn: configService.get<string>('ACCESS_TOKEN_EXPIRES_IN'),
+        },
+      ),
+      this.jwtService.signAsync(
+        {
+          sub: userId,
+          username,
+        },
+        {
+          secret: configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
+          expiresIn: configService.get<string>('REFRESH_TOKEN_EXPIRES_IN'),
+        },
+      ),
+    ]);
     return {
-      data: {
-        access_token: this.jwtService.sign(payload),
-      },
+      access_token,
+      refresh_token,
+    };
+  }
+
+  async updateRefreshToken(user: User, refreshToken: string) {
+    const hashRefreshToken = await this.hashData(refreshToken);
+    await this.userService.updateRefreshToken(user.id, hashRefreshToken);
+  }
+
+  async refreshTokens(userId: number, refreshToken: string) {
+    const user = await this.userService.findOneWithId(userId);
+    if (!user || !user.refresh_token) {
+      throw new ForbiddenException('Access Denied');
+    }
+    const refreshTokenMatches = await bcrypt.compare(
+      refreshToken,
+      user.refresh_token,
+    );
+    if (!refreshTokenMatches) throw new ForbiddenException('!Access Denied');
+    const tokens = await this.getTokens(user.id, user.email);
+    return {
+      data: { tokens },
     };
   }
 }

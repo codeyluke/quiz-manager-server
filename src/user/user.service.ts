@@ -22,4 +22,12 @@ export class UserService {
   async findOneWithUsername(username: string): Promise<User> {
     return await this.repo.findOne({ where: { email: username } });
   }
+
+  async findOneWithId(id: number): Promise<User> {
+    return await this.repo.findOne({ where: { id } });
+  }
+
+  async updateRefreshToken(id: number, refreshToken: string) {
+    return await this.repo.update({ id }, { refresh_token: refreshToken });
+  }
 }
