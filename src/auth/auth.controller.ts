@@ -11,6 +11,7 @@ import { Request } from 'express';
 import { RegisterUserDto } from 'src/user/dto/register-user.req.dto';
 import { RefreshJwtGuard } from './guards/refresh-jwt-auth.guard';
 import { LoginRequestDto } from './dto/login.request.dto';
+import { JwtGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -35,5 +36,12 @@ export class AuthController {
     const userId = req.user['sub'];
     const refreshToken = req.user['refreshToken'];
     return await this.authService.refreshTokens(userId, refreshToken);
+  }
+
+  @UseGuards(JwtGuard)
+  @Post('logout')
+  @HttpCode(200)
+  async logout(@Req() req: Request) {
+    return await this.authService.logout(req.user['sub']);
   }
 }

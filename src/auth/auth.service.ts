@@ -113,4 +113,11 @@ export class AuthService {
       data: { tokens },
     };
   }
+
+  async logout(userId: number) {
+    await this.userService.updateRefreshToken(userId, null);
+    return {
+      data: null,
+    };
+  }
 }
