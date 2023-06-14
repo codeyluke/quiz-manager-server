@@ -5,17 +5,20 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { QuizService } from './quiz.service';
 import { CreateQuizDto } from './dto/create-quiz.dto';
 import { Quiz } from './quiz.entity';
+import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('quizes')
 export class QuizController {
   constructor(private quizService: QuizService) {}
 
+  @UseGuards(JwtGuard)
   @Get('/')
   index() {
     return this.quizService.index();
