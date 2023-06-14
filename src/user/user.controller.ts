@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Req, Request, UseGuards } from '@nestjs/common';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UserService } from './user.service';
 
@@ -8,7 +8,7 @@ export class UserController {
 
   @UseGuards(JwtGuard)
   @Get('/')
-  index() {
-    return 'hs';
+  index(@Req() req: Request) {
+    return this.userService.findOneWithId(req['user'].sub);
   }
 }
