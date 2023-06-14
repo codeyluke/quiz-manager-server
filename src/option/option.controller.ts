@@ -4,6 +4,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -11,8 +12,9 @@ import { OptionService } from './option.service';
 import { CreateOptionDto } from './dto/create-option.dto';
 import { QuestionService } from 'src/question/question.service';
 import { QuizService } from 'src/quiz/quiz.service';
+import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 
-@Controller('quizes/:quiz_id/questions/:question_id/options')
+@Controller('private/v1/quizes/:quiz_id/questions/:question_id/options')
 export class OptionController {
   constructor(
     private optionService: OptionService,
@@ -22,6 +24,7 @@ export class OptionController {
 
   @Post('/')
   @UsePipes(ValidationPipe)
+  @UseGuards(JwtGuard)
   async create(
     @Param('quiz_id', new ParseIntPipe()) quiz_id: number,
     @Param('question_id', new ParseIntPipe()) question_id: number,

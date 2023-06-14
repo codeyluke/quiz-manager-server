@@ -7,13 +7,34 @@ import { OptionModule } from './option/option.module';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { RouterModule } from '@nestjs/core';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync(typeOrmAsyncConfig),
-    QuizModule,
-    QuestionModule,
+    RouterModule.register([
+      {
+        path: 'private',
+        children: [
+          {
+            path: 'v1',
+            children: [
+              {
+                path: 'quizes',
+                module: QuizModule,
+                children: [
+                  {
+                    path: ':quiz_id/questions',
+                    module: QuestionModule,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ]),
     OptionModule,
     UserModule,
     AuthModule,

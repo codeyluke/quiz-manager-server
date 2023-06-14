@@ -5,14 +5,16 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { QuestionService } from './question.service';
 import { QuizService } from 'src/quiz/quiz.service';
+import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 
-@Controller('/quizes/:quiz_id/questions')
+@Controller()
 export class QuestionController {
   constructor(
     private questionService: QuestionService,
@@ -21,6 +23,7 @@ export class QuestionController {
 
   @Post('/')
   @UsePipes(ValidationPipe)
+  @UseGuards(JwtGuard)
   async create(
     @Param('quiz_id', new ParseIntPipe()) quiz_id: number,
     @Body() data: CreateQuestionDto,
@@ -29,8 +32,9 @@ export class QuestionController {
     return this.questionService.create(quiz, data);
   }
 
-  @Get('/:id')
-  show(@Param('id', new ParseIntPipe()) id: number) {
+  @Get('/:question_id')
+  @UseGuards(JwtGuard)
+  show(@Param('question_id', new ParseIntPipe()) id: number) {
     return this.questionService.findById(id);
   }
 }
