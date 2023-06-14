@@ -5,7 +5,6 @@ import {
   Param,
   ParseIntPipe,
   Post,
-  Put,
   UseGuards,
   UsePipes,
   ValidationPipe,
