@@ -35,6 +35,8 @@ import { RouterModule } from '@nestjs/core';
         ],
       },
     ]),
+    QuizModule,
+    QuestionModule,
     OptionModule,
     UserModule,
     AuthModule,
