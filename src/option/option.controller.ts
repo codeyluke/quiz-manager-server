@@ -12,7 +12,7 @@ import { OptionService } from './option.service';
 import { CreateOptionDto } from './dto/create-option.dto';
 import { QuestionService } from 'src/question/question.service';
 import { QuizService } from 'src/quiz/quiz.service';
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller()
 export class OptionController {
@@ -24,7 +24,7 @@ export class OptionController {
 
   @Post('/')
   @UsePipes(ValidationPipe)
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtAuthGuard)
   async create(
     @Param('quiz_id', new ParseIntPipe()) quiz_id: number,
     @Param('question_id', new ParseIntPipe()) question_id: number,

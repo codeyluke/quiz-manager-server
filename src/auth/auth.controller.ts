@@ -9,9 +9,9 @@ import {
 import { AuthService } from './auth.service';
 import { Request } from 'express';
 import { RegisterUserDto } from 'src/user/dto/register-user.req.dto';
-import { RefreshJwtGuard } from './guards/refresh-jwt-auth.guard';
+import { RefreshJwtAuthGuard } from './guards/refresh-jwt-auth.guard';
 import { LoginRequestDto } from './dto/login.request.dto';
-import { JwtGuard } from './guards/jwt-auth.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -29,7 +29,7 @@ export class AuthController {
     return await this.authService.register(data);
   }
 
-  @UseGuards(RefreshJwtGuard)
+  @UseGuards(RefreshJwtAuthGuard)
   @Post('refresh')
   @HttpCode(200)
   async refreshTokens(@Req() req: Request) {
@@ -38,7 +38,7 @@ export class AuthController {
     return await this.authService.refreshTokens(userId, refreshToken);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtAuthGuard)
   @Post('logout')
   @HttpCode(200)
   async logout(@Req() req: Request) {

@@ -12,27 +12,27 @@ import {
 import { QuizService } from './quiz.service';
 import { CreateQuizDto } from './dto/create-quiz.dto';
 import { Quiz } from './quiz.entity';
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller()
 export class QuizController {
   constructor(private quizService: QuizService) {}
 
   @Get('/')
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtAuthGuard)
   index() {
     return this.quizService.index();
   }
 
   @Get('/:id')
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtAuthGuard)
   show(@Param('id', new ParseIntPipe()) id: number): Promise<Quiz> {
     return this.quizService.findById(id);
   }
 
   @Post('/')
   @UsePipes(ValidationPipe)
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtAuthGuard)
   create(@Body() data: CreateQuizDto) {
     return this.quizService.create(data);
   }

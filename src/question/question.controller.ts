@@ -12,7 +12,7 @@ import {
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { QuestionService } from './question.service';
 import { QuizService } from 'src/quiz/quiz.service';
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller()
 export class QuestionController {
@@ -23,7 +23,7 @@ export class QuestionController {
 
   @Post('/')
   @UsePipes(ValidationPipe)
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtAuthGuard)
   async create(
     @Param('quiz_id', new ParseIntPipe()) quiz_id: number,
     @Body() data: CreateQuestionDto,
@@ -33,7 +33,7 @@ export class QuestionController {
   }
 
   @Get('/:question_id')
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtAuthGuard)
   show(@Param('question_id', new ParseIntPipe()) id: number) {
     return this.questionService.findById(id);
   }
