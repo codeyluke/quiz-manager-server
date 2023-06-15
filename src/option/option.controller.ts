@@ -14,7 +14,7 @@ import { QuestionService } from 'src/question/question.service';
 import { QuizService } from 'src/quiz/quiz.service';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 
-@Controller('private/v1/quizes/:quiz_id/questions/:question_id/options')
+@Controller()
 export class OptionController {
   constructor(
     private optionService: OptionService,

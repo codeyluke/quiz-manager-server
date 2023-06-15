@@ -27,6 +27,12 @@ import { RouterModule } from '@nestjs/core';
                   {
                     path: ':quiz_id/questions',
                     module: QuestionModule,
+                    children: [
+                      {
+                        path: ':question_id/options',
+                        module: OptionModule,
+                      },
+                    ],
                   },
                 ],
               },
